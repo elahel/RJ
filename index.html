@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>R&J Lanches e Pizzas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background: #610303;
+      padding-top: 70px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .navbar {
+      background-color: #000000;
+      border-bottom: 3px solid #ffee07;
+    }
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: #FFD700 !important; /* Dourado */
+    }
+    .carrinho-link {
+      color: #FFD700 !important;
+      font-weight: 600;
+      text-decoration: none;
+      position: relative;
+    }
+    .carrinho-link:hover {
+      color: #e6c200 !important;
+    }
+    .card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgb(0 0 0 / 0.1);
+      overflow: hidden;
+    }
+    .card-body {
+      text-align: center;
+    }
+    .card-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .btn-success {
+      background-color: #ffee07;
+      border-color: #ffee07;
+      color: #333;
+      font-weight: 600;
+    }
+    .btn-success:hover {
+      background-color: #e6c200;
+      border-color: #e6c200;
+      color: #222;
+    }
+    .nav-tabs .nav-link {
+      font-weight: 600;
+      color: #444;
+    }
+    .nav-tabs .nav-link.active {
+      background-color: #ffee07;
+      color: #000;
+    }
+    #searchInput {
+      margin-bottom: 1rem;
+    }
+    .card-img-top {
+      max-height: 180px;
+      object-fit: cover;
+      border-radius: 12px 12px 0 0;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar fixed-top navbar-light shadow-sm">
+    <div class="container justify-content-between">
+      <a class="navbar-brand" href="#">🍕 R&J Lanches e Pizzas</a>
+      <a class="carrinho-link" href="pedidos.html">
+        🛒 <small>Carrinho</small>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrinho">0</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Conteúdo -->
+  <main class="container mt-4">
+    <!-- Campo de Pesquisa -->
+    <input type="text" id="searchInput" class="form-control" placeholder="🔍 Pesquise um produto...">
+
+    <!-- Abas -->
+    <ul class="nav nav-tabs" id="tabsProdutos" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab-pizzas" data-bs-toggle="tab" data-bs-target="#pizzas" type="button" role="tab">🍕 Pizzas</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-hamburguer" data-bs-toggle="tab" data-bs-target="#hamburguer" type="button" role="tab">🍔 Hambúrgueres</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-bebidas" data-bs-toggle="tab" data-bs-target="#bebidas" type="button" role="tab">🥤 Bebidas</button>
+      </li>
+    </ul>
+
+    <!-- Conteúdo das Abas -->
+    <div class="tab-content pt-3">
+      <div class="tab-pane fade show active" id="pizzas" role="tabpanel">
+        <div class="row" id="lista-pizzas"></div>
+      </div>
+      <div class="tab-pane fade" id="hamburguer" role="tabpanel">
+        <div class="row" id="lista-hamburguer"></div>
+      </div>
+      <div class="tab-pane fade" id="bebidas" role="tabpanel">
+        <div class="row" id="lista-bebidas"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Script -->
+  <script>
+    const produtos = [
+      {
+        nome: "Pizza Margherita",
+        preco: 25.00,
+        categoria: "pizzas",
+        imagem: "https://i.imgur.com/3zL2FxZ.jpg"
+      },
+      {
+        nome: "Pizza Calabresa",
+        preco: 28.00,
+        categoria: "pizzas",
+        imagem: "https://i.imgur.com/xQp5BEX.jpg"
+      },
+      {
+        nome: "Hambúrguer Clássico",
+        preco: 22.00,
+        categoria: "hamburguer",
+        imagem: "https://i.imgur.com/Qp28TrB.jpg"
+      },
+      {
+        nome: "Cheeseburguer",
+        preco: 24.00,
+        categoria: "hamburguer",
+        imagem: "https://i.imgur.com/J8mrCxH.jpg"
+      },
+      {
+        nome: "Refrigerante Lata",
+        preco: 6.00,
+        categoria: "bebidas",
+        imagem: "https://i.imgur.com/1A0NpOf.jpg"
+      },
+      {
+        nome: "Suco Natural",
+        preco: 8.00,
+        categoria: "bebidas",
+        imagem: "https://i.imgur.com/tW2tJO7.jpg"
+      },
+      // Exemplo de produto novo
+      {
+        nome: "Pizza Frango com Catupiry",
+        preco: 30.00,
+        categoria: "pizzas",
+        imagem: "https://i.imgur.com/FRtgWq8.jpg"
+      }
+    ];
+
+    let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+
+    function atualizarContadorCarrinho() {
+      document.getElementById("contador-carrinho").textContent = carrinho.length;
+    }
+
+    function adicionarAoCarrinho(produto) {
+      carrinho.push(produto);
+      localStorage.setItem('carrinho', JSON.stringify(carrinho));
+      atualizarContadorCarrinho();
+      alert(`${produto.nome} adicionado ao carrinho!`);
+    }
+
+    function criarCard(produto) {
+      return `
+        <div class="col-md-4 mb-4 produto" data-nome="${produto.nome.toLowerCase()}">
+          <div class="card h-100 shadow-sm">
+            <img src="${produto.imagem}" class="card-img-top" alt="${produto.nome}">
+            <div class="card-body">
+              <h5 class="card-title">${produto.nome}</h5>
+              <p class="card-text">R$ ${produto.preco.toFixed(2)}</p>
+              <button class="btn btn-success" onclick='adicionarAoCarrinho(${JSON.stringify(produto)})'>Adicionar ao Carrinho</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderizarProdutos() {
+      const listaPizzas = document.getElementById('lista-pizzas');
+      const listaHamburguer = document.getElementById('lista-hamburguer');
+      const listaBebidas = document.getElementById('lista-bebidas');
+
+      listaPizzas.innerHTML = '';
+      listaHamburguer.innerHTML = '';
+      listaBebidas.innerHTML = '';
+
+      produtos.forEach(produto => {
+        const card = criarCard(produto);
+        if (produto.categoria === "pizzas") listaPizzas.innerHTML += card;
+        if (produto.categoria === "hamburguer") listaHamburguer.innerHTML += card;
+        if (produto.categoria === "bebidas") listaBebidas.innerHTML += card;
+      });
+    }
+
+    // Filtro por pesquisa
+    function filtrarProdutos() {
+      const termo = document.getElementById("searchInput").value.toLowerCase();
+      document.querySelectorAll(".produto").forEach(card => {
+        card.style.display = card.dataset.nome.includes(termo) ? "block" : "none";
+      });
+    }
+
+    document.getElementById("searchInput").addEventListener("input", filtrarProdutos);
+
+    window.onload = () => {
+      renderizarProdutos();
+      atualizarContadorCarrinho();
+    };
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
