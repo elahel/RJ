@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Meu Carrinho</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Favicon -->
+  <link rel="icon" href="IMG/Logo R&J.png" type="image/x-icon">
+  <link rel="icon" href="IMG/Logo R&J.png" type="image/png">
+  <link rel="icon" sizes="32x32" href="IMG/Logo R&J.png" type="image/png">
+  <link rel="icon" sizes="48x48" href="IMG/Logo R&J.png" type="image/png">
+  <link rel="apple-touch-icon" href="IMG/Logo R&J.png">
+
+  <style>
+    body {
+      background-color: #610303;
+      padding-top: 40px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #ffee07;
+      /* texto dourado padrão */
+    }
+
+    /* Itens fora do card: totais, avisos, cabeçalhos, botões */
+    h1,
+    p strong,
+    #aviso-taxas,
+    #total,
+    #finalizar-pedido {
+      color: #ffee07 !important;
+    }
+
+    /* Itens dentro da lista do carrinho - todo texto dourado */
+    .list-group-item {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    /* Nome do item em destaque dentro do card */
+    .item-nome {
+      font-weight: 700;
+      user-select: none;
+      flex-grow: 1;
+      align-self: center;
+    }
+
+    /* Adicionais ficam pretos para legibilidade */
+    .adicionais-section,
+    .adicionais-section label {
+      color: #000;
+    }
+
+    /* Botões principais */
+    #finalizar-pedido {
+      background-color: #198754;
+      /* verde */
+      border-color: #198754;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    #finalizar-pedido:hover {
+      background-color: #145c32;
+      border-color: #145c32;
+      color: #fff;
+    }
+
+    #limpar-carrinho {
+      background-color: #FFD700;
+      /* amarelo */
+      border-color: #FFD700;
+      color: #333;
+      font-weight: 600;
+    }
+
+    #limpar-carrinho:hover {
+      background-color: #e6c200;
+      border-color: #e6c200;
+      color: #222;
+    }
+
+    #voltar {
+      margin-right: auto;
+    }
+
+    /* Botão para abrir adicionais */
+    .btn-adicionais {
+      margin-left: 10px;
+      font-size: 0.9rem;
+      padding: 0 8px;
+    }
+
+    /* Botões quantidade e remover */
+    .btn-qty {
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      font-weight: 700;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .qty-display {
+      min-width: 25px;
+      text-align: center;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1 class="mb-4">🛒 Meu Carrinho</h1>
+    <ul id="lista-carrinho" class="list-group mb-3"></ul>
+    <p><strong>Total: R$ <span id="total">0.00</span></strong></p>
+    <div id="aviso-taxas">
+      ⚠️ Pagamento no cartão de crédito pode adicionar uma taxa extra.<br>
+      🚚 Verifique nossa taxa de entrega.
+    </div>
+    <div class="d-flex gap-2 mt-3">
+      <a href="index.html" class="btn btn-secondary" id="voltar">← Voltar</a>
+      <button class="btn" id="limpar-carrinho">🗑️ Limpar Carrinho</button>
+      <a href="finalizar.html" class="btn" id="finalizar-pedido">📦 Finalizar Pedido</a>
+    </div>
+  </div>
+
+  <script>
+    const lista = document.getElementById('lista-carrinho');
+    const totalSpan = document.getElementById('total');
+    const finalizarBtn = document.getElementById('finalizar-pedido');
+    const limparBtn = document.getElementById('limpar-carrinho');
+
+    const adicionaisPizzas = [
+      { nome: "Borda recheada", preco: 5.00 },
+      { nome: "Extra queijo", preco: 3.50 },
+      { nome: "Calabresa extra", preco: 4.00 }
+    ];
+    const adicionaisHamburguer = [
+      { nome: "Salsicha", preco: 6.00 },
+      { nome: "Ovo", preco: 3.00 },
+      { nome: "Presunto", preco: 4.50 },
+      { nome: "Mussarela", preco: 4.50 },
+      { nome: "Bacon", preco: 4.50 },
+      { nome: "Catupiry", preco: 4.50 },
+      { nome: "Hamburguer", preco: 4.50 },
+      { nome: "Calabresa", preco: 4.50 },
+    ];
+
+    let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+
+    carrinho = carrinho.map(item => {
+      if (!item.quantidade || item.quantidade < 1) item.quantidade = 1;
+      if (!item.adicionais) item.adicionais = [];
+      return item;
+    });
+
+    function atualizarCarrinho() {
+      lista.innerHTML = "";
+      let total = 0;
+
+      if (carrinho.length === 0) {
+        lista.innerHTML = '<li class="list-group-item">Carrinho vazio.</li>';
+        totalSpan.textContent = "0.00";
+        finalizarBtn.style.display = 'none';
+        limparBtn.style.display = 'none';
+        return;
+      }
+
+      finalizarBtn.style.display = 'inline-block';
+      limparBtn.style.display = 'inline-block';
+
+      carrinho.forEach((item, index) => {
+        const adicionais = item.adicionais || [];
+        const precoAdicionais = adicionais.reduce((acc, a) => acc + a.preco, 0);
+        const precoTotalItem = (item.preco + precoAdicionais) * item.quantidade;
+        total += precoTotalItem;
+
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+
+        li.innerHTML = `
+          <div style="width:100%; display: flex; align-items: center;">
+            <div class="item-nome">${item.nome} - R$ ${item.preco.toFixed(2)}</div>
+            <button type="button" class="btn btn-sm btn-outline-primary btn-adicionais" onclick="toggleAdicionais(${index})">
+              Adicionais
+            </button>
+          </div>
+          <div class="adicionais-section" id="adicionais-${index}">
+            ${gerarCheckboxAdicionais(item.categoria, index)}
+          </div>
+          <div class="d-flex align-items-center gap-2 mt-2" style="flex-wrap: nowrap;">
+            <button class="btn btn-sm btn-danger btn-qty" onclick="alterarQuantidade(${index}, -1)">−</button>
+            <div class="qty-display">${item.quantidade}</div>
+            <button class="btn btn-sm btn-success btn-qty" onclick="alterarQuantidade(${index}, 1)">+</button>
+            <button class="btn btn-sm btn-outline-danger ms-3" onclick="removerItem(${index})">Remover</button>
+          </div>
+          <div><strong>Subtotal: R$ ${precoTotalItem.toFixed(2)}</strong></div>
+        `;
+
+        lista.appendChild(li);
+      });
+
+      totalSpan.textContent = total.toFixed(2);
+    }
+
+    function toggleAdicionais(index) {
+      const div = document.getElementById('adicionais-' + index);
+      if (div) {
+        div.style.display = (div.style.display === 'block') ? 'none' : 'block';
+      }
+    }
+
+    function gerarCheckboxAdicionais(categoria, itemIndex) {
+      let adicionaisArray = [];
+      if (categoria === "pizzas") adicionaisArray = adicionaisPizzas;
+      else if (categoria === "hamburguer") adicionaisArray = adicionaisHamburguer;
+      else return "<small>Nenhum adicional disponível.</small>";
+
+      return adicionaisArray.map((add, i) => {
+        const selecionado = carrinho[itemIndex].adicionais.some(a => a.nome === add.nome);
+        return `
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="add-${itemIndex}-${i}" 
+              data-item-index="${itemIndex}" data-add-index="${i}" ${selecionado ? 'checked' : ''} onchange="toggleAdicional(${itemIndex}, ${i})">
+            <label class="form-check-label" for="add-${itemIndex}-${i}">
+              ${add.nome} (R$ ${add.preco.toFixed(2)})
+            </label>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleAdicional(itemIndex, addIndex) {
+      const categoria = carrinho[itemIndex].categoria;
+      const adicionaisArray = categoria === "pizzas" ? adicionaisPizzas : adicionaisHamburguer;
+      const adicional = adicionaisArray[addIndex];
+
+      const idx = carrinho[itemIndex].adicionais.findIndex(a => a.nome === adicional.nome);
+      if (idx > -1) {
+        carrinho[itemIndex].adicionais.splice(idx, 1);
+      } else {
+        carrinho[itemIndex].adicionais.push(adicional);
+      }
+
+      localStorage.setItem('carrinho', JSON.stringify(carrinho));
+      atualizarCarrinho();
+    }
+
+    function alterarQuantidade(index, delta) {
+      let item = carrinho[index];
+      item.quantidade += delta;
+      if (item.quantidade < 1) {
+        item.quantidade = 1;
+      }
+      localStorage.setItem('carrinho', JSON.stringify(carrinho));
+      atualizarCarrinho();
+    }
+
+    function removerItem(index) {
+      if (confirm(`Remover "${carrinho[index].nome}" do carrinho?`)) {
+        carrinho.splice(index, 1);
+        localStorage.setItem('carrinho', JSON.stringify(carrinho));
+        atualizarCarrinho();
+      }
+    }
+
+    limparBtn.addEventListener('click', () => {
+      if (confirm('Deseja limpar todo o carrinho?')) {
+        carrinho = [];
+        localStorage.removeItem('carrinho');
+        atualizarCarrinho();
+      }
+    });
+
+    atualizarCarrinho();
+  </script>
+
+</body>
+
+</html>

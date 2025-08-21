@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>R&J Lanches e Pizzas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="IMG/Logo R&J.png" type="image/x-icon">
+  <link rel="icon" href="IMG/Logo R&J.png" type="image/png">
+  <link rel="icon" sizes="32x32" href="IMG/Logo R&J.png" type="image/png">
+  <link rel="icon" sizes="48x48" href="IMG/Logo R&J.png" type="image/png">
+  <link rel="apple-touch-icon" href="IMG/Logo R&J.png">
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background: #610303;
+      padding-top: 70px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .navbar {
+      background-color: #aa5d1e;
+      border-bottom: 3px solid #ffee07;
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: #FFD700 !important;
+    }
+
+    .carrinho-link {
+      color: #FFD700 !important;
+      font-weight: 600;
+      text-decoration: none;
+      position: relative;
+    }
+
+    .carrinho-link:hover {
+      color: #e6c200 !important;
+    }
+
+    .card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgb(0 0 0 / 0.1);
+      overflow: hidden;
+    }
+
+    .card-body {
+      text-align: center;
+    }
+
+    .card-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .btn-success {
+      background-color: #ffee07;
+      border-color: #ffee07;
+      color: #333;
+      font-weight: 600;
+    }
+
+    .btn-success:hover {
+      background-color: #e6c200;
+      border-color: #e6c200;
+      color: #222;
+    }
+
+    .btn-danger {
+      font-weight: 600;
+    }
+
+    .nav-tabs .nav-link {
+      font-weight: 600;
+      color: #444;
+    }
+
+    .nav-tabs .nav-link.active {
+      background-color: #ffee07;
+      color: #000;
+    }
+
+    #searchInput {
+      margin-bottom: 1rem;
+    }
+
+    .card-img-top {
+      max-height: 180px;
+      object-fit: cover;
+      border-radius: 12px 12px 0 0;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Navbar -->
+  <!-- Navbar -->
+  <nav class="navbar fixed-top navbar-light shadow-sm">
+    <div class="container justify-content-between">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <img src="IMG/Logo R&J.png" alt="Logo R&J" height="40" class="me-2">
+        R&J Lanches e Pizzas
+      </a>
+      <a class="carrinho-link" href="pedidos.html">
+        🛒 <small>Carrinho</small>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          id="contador-carrinho">0</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Conteúdo -->
+  <main class="container mt-4">
+    <input type="text" id="searchInput" class="form-control" placeholder="🔍 Pesquise um produto...">
+
+    <ul class="nav nav-tabs" id="tabsProdutos" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab-pizzas" data-bs-toggle="tab" data-bs-target="#pizzas" type="button"
+          role="tab">🍕 Pizzas</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-hamburguer" data-bs-toggle="tab" data-bs-target="#hamburguer" type="button"
+          role="tab">🍔 Lanches</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-bebidas" data-bs-toggle="tab" data-bs-target="#bebidas" type="button"
+          role="tab">🥤 Bebidas</button>
+      </li>
+    </ul>
+
+    <div class="tab-content pt-3">
+      <div class="tab-pane fade show active" id="pizzas" role="tabpanel">
+        <div class="row" id="lista-pizzas"></div>
+      </div>
+      <div class="tab-pane fade" id="hamburguer" role="tabpanel">
+        <div class="row" id="lista-hamburguer"></div>
+      </div>
+      <div class="tab-pane fade" id="bebidas" role="tabpanel">
+        <div class="row" id="lista-bebidas"></div>
+      </div>
+    </div>
+
+    <!-- Botão para limpar o carrinho -->
+    <div class="mt-4 text-center">
+      <button class="btn btn-danger" onclick="limparCarrinho()">Esvaziar Carrinho</button>
+    </div>
+  </main>
+
+  <script>
+     const produtos = [
+      { nome: "Pizza Bacon", preco: 50.00, categoria: "pizzas", imagem: "img/bacon-1.jpg" },
+      { nome: "Pizza Mussarela", preco: 50.00, categoria: "pizzas", imagem: "img/mussarela.jpg" },
+      { nome: "Pizza Calabresa", preco: 50.00, categoria: "pizzas", imagem: "img/calabresa.jpg" },
+      { nome: "Pizza Frango c/ Catupiry", preco: 50.00, categoria: "pizzas", imagem: "img/frango.jpg" },
+      { nome: "Pizza Presunto/Mussarela", preco: 50.00, categoria: "pizzas", imagem: "img/presunto.jpg" },
+      { nome: "Pizza Brócolis", preco: 50.00, categoria: "pizzas", imagem: "img/brocolis.jpg" },
+      { nome: "Pizza Milho", preco: 50.00, categoria: "pizzas", imagem: "img/milho.jpg" },
+      { nome: "Pizza Portuguesa", preco: 50.00, categoria: "pizzas", imagem: "img/portuguesa.jpg" },
+      { nome: "Pizza Catupiresa", preco: 50.00, categoria: "pizzas", imagem: "img/catupireza-1-165x108.jpg" },
+      { nome: "Pizza Romanesca", preco: 50.00, categoria: "pizzas", imagem: "img/romanesca.jpg" },
+      { nome: "Pizza Atum", preco: 50.00, categoria: "pizzas", imagem: "img/atum.jpg" },
+      { nome: "Pizza 2 Queijos", preco: 50.00, categoria: "pizzas", imagem: "img/2queijos.jpg" },
+      { nome: "Pizza 3 Queijos", preco: 50.00, categoria: "pizzas", imagem: "img/3queijos.jpg" },
+      { nome: "Pizza Moda da Casa", preco: 50.00, categoria: "pizzas", imagem: "img/modadacasa.jpg" },
+
+      { nome: "X-Burguer Simples", preco: 14.00, categoria: "hamburguer", imagem: "img/x-burguer.jpg" },
+      { nome: "X-Burguer Especial", preco: 16.00, categoria: "hamburguer", imagem: "img/x-burguer-especial.jpg" },
+      { nome: "X-Bacon", preco: 20.00, categoria: "hamburguer", imagem: "img/x-bacon.jpg" },
+      { nome: "X-Bacon Egg Salada", preco: 22.00, categoria: "hamburguer", imagem: "img/x-bacon-egg.png" },
+      { nome: "X-Egg", preco: 17.00, categoria: "hamburguer", imagem: "img/x-egg.jpg" },
+      { nome: "X-Salada", preco: 17.00, categoria: "hamburguer", imagem: "img/x-salada.png" },
+      { nome: "X-Calabresa", preco: 20.00, categoria: "hamburguer", imagem: "img/x-calabresa.jpg" },
+      { nome: "X-Tudão", preco: 27.00, categoria: "hamburguer", imagem: "img/x-tudao.jpg" },
+      { nome: "Franburguer", preco: 20.00, categoria: "hamburguer", imagem: "img/franburguer.png" },
+      { nome: "Dog Simples", preco: 12.00, categoria: "hamburguer", imagem: "img/dog-simples.jpg" },
+      { nome: "Dog Especial", preco: 15.00, categoria: "hamburguer", imagem: "img/dog-especial.jpg" },
+      { nome: "Dog Bacon Especial", preco: 20.00, categoria: "hamburguer", imagem: "img/dog-bacon.jpg" },
+      { nome: "Dog Saladão", preco: 16.00, categoria: "hamburguer", imagem: "img/dog-salada.jpg" },
+
+      { nome: "Refrigerante Lata", preco: 6.00, categoria: "bebidas", imagem: "img/refrilata.jpg" },
+      { nome: "Refrigerante 2 Litros", preco: 6.00, categoria: "bebidas", imagem: "img/refri2l.jpg" },
+      { nome: "Cerveja Lata", preco: 6.00, categoria: "bebidas", imagem: "img/cervalata.jpg" },
+      { nome: "Cerveja Longneck", preco: 6.00, categoria: "bebidas", imagem: "img/longneck.jpg" },
+      { nome: "Suco Natural", preco: 8.00, categoria: "bebidas", imagem: "img/sucos.jpg" },
+      { nome: "Vinhos", preco: 12.00, categoria: "bebidas", imagem: "img/vinho.jpg" },
+    ];
+
+
+    let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+
+    function atualizarContadorCarrinho() {
+      const total = carrinho.reduce((soma, item) => soma + (item.quantidade || 1), 0);
+      const badge = document.getElementById("contador-carrinho");
+
+      if (total === 0) {
+        badge.style.display = "none"; // esconde a badge quando carrinho vazio
+      } else {
+        badge.style.display = "inline-block";
+        badge.textContent = total;
+      }
+    }
+
+    function adicionarAoCarrinho(produto) {
+      const existente = carrinho.find(p => p.nome === produto.nome);
+      if (existente) {
+        existente.quantidade = (existente.quantidade || 1) + 1;
+      } else {
+        produto.quantidade = 1;
+        carrinho.push(produto);
+      }
+      localStorage.setItem('carrinho', JSON.stringify(carrinho));
+      atualizarContadorCarrinho();
+      alert(`${produto.nome} adicionado ao carrinho!`);
+    }
+
+    function limparCarrinho() {
+      carrinho = [];
+      localStorage.setItem('carrinho', JSON.stringify(carrinho));
+      atualizarContadorCarrinho();
+      alert("Carrinho limpo!");
+    }
+
+    function criarCard(produto) {
+      return `
+        <div class="col-md-4 mb-4 produto" data-nome="${produto.nome.toLowerCase()}">
+          <div class="card h-100 shadow-sm">
+            <img src="${produto.imagem}" class="card-img-top" alt="${produto.nome}">
+            <div class="card-body">
+              <h5 class="card-title">${produto.nome}</h5>
+              <p class="card-text">R$ ${produto.preco.toFixed(2)}</p>
+              <button class="btn btn-success" onclick='adicionarAoCarrinho(${JSON.stringify(produto)})'>Adicionar ao Carrinho</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderizarProdutos() {
+      const listaPizzas = document.getElementById('lista-pizzas');
+      const listaHamburguer = document.getElementById('lista-hamburguer');
+      const listaBebidas = document.getElementById('lista-bebidas');
+
+      listaPizzas.innerHTML = '';
+      listaHamburguer.innerHTML = '';
+      listaBebidas.innerHTML = '';
+
+      produtos.forEach(produto => {
+        const card = criarCard(produto);
+        if (produto.categoria === "pizzas") listaPizzas.innerHTML += card;
+        if (produto.categoria === "hamburguer") listaHamburguer.innerHTML += card;
+        if (produto.categoria === "bebidas") listaBebidas.innerHTML += card;
+      });
+    }
+
+    function filtrarProdutos() {
+      const termo = document.getElementById("searchInput").value.toLowerCase();
+      document.querySelectorAll(".produto").forEach(card => {
+        card.style.display = card.dataset.nome.includes(termo) ? "block" : "none";
+      });
+    }
+
+    document.getElementById("searchInput").addEventListener("input", filtrarProdutos);
+
+    window.onload = () => {
+      renderizarProdutos();
+      atualizarContadorCarrinho();
+    };
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
